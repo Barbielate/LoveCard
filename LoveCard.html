@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>專屬愛心卡</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fdf3f5;--fg:#3a2a30;--card:#fff;--mut:#9a8389;--ac:#e0567a;--bd:#f0dde2}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1417;--fg:#f5e6ea;--card:#2a1e23;--mut:#a38c93;--ac:#f27a9a;--bd:#3d2c33}}
+:root[data-theme="dark"]{--bg:#1c1417;--fg:#f5e6ea;--card:#2a1e23;--mut:#a38c93;--ac:#f27a9a;--bd:#3d2c33}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+.cc{border-radius:20px;padding:22px;color:#fff;background:linear-gradient(135deg,#ff8fab,#e0567a 55%,#b13a64);box-shadow:0 10px 24px rgba(224,86,122,.35);position:relative;overflow:hidden}
+.cc:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.15)}
+.row{display:flex;justify-content:space-between;align-items:center}
+.chip{width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#e6b95c)}
+.lbl{font-size:12px;opacity:.85;margin-top:22px}
+.bal{font-size:38px;font-weight:700;letter-spacing:1px}
+.num{letter-spacing:3px;font-size:14px;margin-top:14px;opacity:.9}
+h2{font-size:16px;margin:26px 0 10px}
+.item{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.ic{font-size:26px}.inf{flex:1}.nm{font-weight:600}.sub{font-size:12px;color:var(--mut)}
+button{font:inherit;border:0;border-radius:999px;padding:8px 14px;background:var(--ac);color:#fff;cursor:pointer}
+button:disabled{opacity:.35}
+button.g{background:transparent;color:var(--ac);border:1px solid var(--ac);padding:6px 12px;font-size:13px}
+.amt{font-weight:600;color:var(--mut)}
+.empty{color:var(--mut);text-align:center;padding:16px;font-size:14px}
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-top:10px;display:none;gap:8px;flex-wrap:wrap}
+.panel.on{display:flex}
+input{flex:1;min-width:90px;font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+.tools{display:flex;gap:8px;margin-top:14px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<main>
+  <div class="cc">
+    <div class="row"><b>♥ 小寶專屬集點卡</b><div class="chip"></div></div>
+    <div class="lbl">可用餘額</div>
+    <div class="bal"><span id="bal">0</span> <small style="font-size:14px">點</small></div>
+    <div class="num">**** **** **** 1314</div>
+    <div class="row" style="margin-top:10px;font-size:12px"><span id="owner">MY DEAR</span><span>VALID THRU ∞</span></div>
+  </div>
+
+  <div class="tools">
+    <button class="g" onclick="tog('p1')">＋ 儲值點數</button>
+    <button class="g" onclick="tog('p2')">＋ 新增兌換券</button>
+    <button class="g" onclick="tog('p3')">✎ 設定名字</button>
+  </div>
+  <div class="panel" id="p1"><input id="a1" type="number" placeholder="點數"><input id="n1" placeholder="原因（例：洗碗）"><button onclick="topup()">儲值</button></div>
+  <div class="panel" id="p2"><input id="n2" placeholder="兌換券名稱"><input id="c2" type="number" placeholder="所需點數"><input id="i2" placeholder="圖示 emoji" style="max-width:100px"><button onclick="addV()">新增</button></div>
+  <div class="panel" id="p3"><input id="o3" placeholder="卡片上的名字（英文）"><button onclick="setOwner()">儲存</button></div>
+
+  <h2>🎟 兌換券</h2>
+  <div id="vs"></div>
+
+  <h2>📜 歷史紀錄</h2>
+  <div id="hs"></div>
+  <div style="text-align:center;margin-top:20px"><button class="g" onclick="reset()">重設資料</button></div>
+</main>
+<div id="toast"></div>
+<script>
+var KEY="lovecard.v1";
+var def={bal:520,owner:"MY DEAR",vs:[
+{n:"飲料一杯",c:50,i:""},{n:"指定餐廳約會",c:300,i:""},{n:"早餐一份",c:200,i:""},{n:"小禮物一份",c:150,i:""},{n:"買衣服",c:500,i:""}],
+hs:[{n:"初始儲值",c:520,d:"開卡禮"}]};
+var S;
+function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):JSON.parse(JSON.stringify(def))}catch(e){S=JSON.parse(JSON.stringify(def))}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function today(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()}
+function toast(t){var e=document.getElementById("toast");e.textContent=t;e.className="on";setTimeout(function(){e.className=""},1800)}
+function tog(id){document.getElementById(id).classList.toggle("on")}
+function render(){
+  document.getElementById("bal").textContent=S.bal;
+  document.getElementById("owner").textContent=S.owner;
+  var v=document.getElementById("vs");
+  v.innerHTML=S.vs.length?S.vs.map(function(x,i){return '<div class="item"><span class="ic">'+esc(x.i||"🎟")+'</span><div class="inf"><div class="nm">'+esc(x.n)+'</div><div class="sub">'+x.c+' 點</div></div><button onclick="redeem('+i+')"'+(S.bal<x.c?" disabled":"")+'>兌換</button></div>'}).join(""):'<div class="empty">還沒有兌換券</div>';
+  var h=document.getElementById("hs");
+  h.innerHTML=S.hs.length?S.hs.map(function(x){var p=x.c>0;return '<div class="item"><div class="inf"><div class="nm">'+esc(x.n)+'</div><div class="sub">'+esc(x.d)+'</div></div><span class="amt" style="color:'+(p?"var(--ac)":"var(--mut)")+'">'+(p?"+":"")+x.c+'</span></div>'}).join(""):'<div class="empty">尚無紀錄</div>';
+}
+function redeem(i){var x=S.vs[i];if(S.bal<x.c)return;if(!confirm("確定兌換「"+x.n+"」？"))return;S.bal-=x.c;S.hs.unshift({n:"兌換："+x.n,c:-x.c,d:today()});save();render();toast("兌換成功 ♥")}
+function topup(){var a=parseInt(document.getElementById("a1").value),n=document.getElementById("n1").value.trim();if(!a||a<=0)return toast("請輸入點數");S.bal+=a;S.hs.unshift({n:"儲值："+(n||"獲得點數"),c:a,d:today()});document.getElementById("a1").value="";document.getElementById("n1").value="";save();render();toast("已儲值 "+a+" 點")}
+function addV(){var n=document.getElementById("n2").value.trim(),c=parseInt(document.getElementById("c2").value),i=document.getElementById("i2").value.trim();if(!n||!c)return toast("請填名稱與點數");S.vs.push({n:n,c:c,i:i||"🎟"});["n2","c2","i2"].forEach(function(k){document.getElementById(k).value=""});save();render();toast("已新增")}
+function setOwner(){var o=document.getElementById("o3").value.trim();if(!o)return;S.owner=o.toUpperCase();save();render();toast("已更新")}
+function reset(){if(confirm("確定要清除全部資料？")){S=JSON.parse(JSON.stringify(def));save();render()}}
+load();render();
+</script>
+</body>
+</html>
