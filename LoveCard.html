@@ -29,13 +29,16 @@ button.g{background:transparent;color:var(--ac);border:1px solid var(--ac);paddi
 .empty{color:var(--mut);text-align:center;padding:16px;font-size:14px}
 .panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-top:10px;display:none;gap:8px;flex-wrap:wrap}
 .panel.on{display:flex}
-input{flex:1;min-width:90px;font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
-.tools{display:flex;gap:8px;margin-top:14px}
+input,select{flex:1;min-width:90px;font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+.tools{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+#lock{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}#lock input{flex:none;width:200px;text-align:center;font-size:20px;letter-spacing:6px}
+.chips{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.chips button{padding:5px 12px;font-size:13px}.chips button.on{background:var(--ac);color:#fff}.done .nm{text-decoration:line-through;color:var(--mut)}.x{background:none;color:var(--mut);padding:4px 8px;font-size:16px}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
 #toast.on{opacity:1}
 </style>
 </head>
 <body>
+<div id="lock"><div style="font-size:48px">💳</div><div id="lt">輸入密碼</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()"><button onclick="unlock()">解鎖</button></div>
 <main>
   <div class="cc">
     <div class="row"><b>♥ 小寶專屬集點卡</b><div class="chip"></div></div>
@@ -48,18 +51,24 @@ input{flex:1;min-width:90px;font:inherit;padding:8px 10px;border-radius:10px;bor
   <div class="tools">
     <button class="g" onclick="tog('p1')">＋ 儲值點數</button>
     <button class="g" onclick="tog('p2')">＋ 新增兌換券</button>
-    <button class="g" onclick="tog('p3')">✎ 設定名字</button>
+    <button class="g" onclick="tog('p4')">＋ 願望清單</button>
+    <button class="g" onclick="tog('p3')"> 設定</button>
   </div>
   <div class="panel" id="p1"><input id="a1" type="number" placeholder="點數"><input id="n1" placeholder="原因（例：洗碗）"><button onclick="topup()">儲值</button></div>
   <div class="panel" id="p2"><input id="n2" placeholder="兌換券名稱"><input id="c2" type="number" placeholder="所需點數"><input id="i2" placeholder="圖示 emoji" style="max-width:100px"><button onclick="addV()">新增</button></div>
-  <div class="panel" id="p3"><input id="o3" placeholder="卡片上的名字（英文）"><button onclick="setOwner()">儲存</button></div>
+  <div class="panel" id="p4"><select id="t4" style="flex:none"><option> 景點</option><option> 餐廳</option><option> 其他</option></select><input id="n4" placeholder="名稱（例：鼎泰豐）"><input id="m4" placeholder="備註／地點（選填）"><button onclick="addW()">加入</button></div>
+  <div class="panel" id="p3"><input id="o3" placeholder="卡片上的名字（英文）"><button onclick="setOwner()">儲存</button><input id="np" type="password" placeholder="新密碼"><button onclick="chPin()">改密碼</button></div>
 
   <h2>🎟 兌換券</h2>
   <div id="vs"></div>
 
-  <h2>📜 歷史紀錄</h2>
+  <h2> 願望清單</h2>
+  <div class="chips" id="wf"></div>
+  <div id="ws"></div>
+
+  <h2> 歷史紀錄</h2>
   <div id="hs"></div>
-  <div style="text-align:center;margin-top:20px"><button class="g" onclick="reset()">重設資料</button></div>
+  <div style="text-align:center;margin-top:20px"><button class="g" onclick="exp()">匯出備份</button> <button class="g" onclick="document.getElementById('f').click()">匯入備份</button> <button class="g" onclick="lockNow()"> 鎖定</button> <button class="g" onclick="reset()">重設</button><input type="file" id="f" accept=".json" hidden onchange="imp(event)"></div>
 </main>
 <div id="toast"></div>
 <script>
@@ -68,13 +77,59 @@ var def={bal:520,owner:"MY DEAR",vs:[
 {n:"飲料一杯",c:50,i:""},{n:"指定餐廳約會",c:300,i:""},{n:"早餐一份",c:200,i:""},{n:"小禮物一份",c:150,i:""},{n:"買衣服",c:500,i:""}],
 hs:[{n:"初始儲值",c:520,d:"開卡禮"}]};
 var S;
-function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):JSON.parse(JSON.stringify(def))}catch(e){S=JSON.parse(JSON.stringify(def))}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function cp(o){return JSON.parse(JSON.stringify(o))}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("儲存失敗，請檢查瀏覽器設定")}}
+function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):cp(def)}catch(e){S=cp(def)}render()}
+/* PIN 鎖 */
+var PK="lovecard.pin";
+function hash(t){
+  if(window.crypto&&crypto.subtle){return crypto.subtle.digest("SHA-256",new TextEncoder().encode("lc"+t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
+  var h=5381;for(var i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))|0;return Promise.resolve("f"+h)
+}
+function lockInit(){
+  var has=null;try{has=localStorage.getItem(PK)}catch(e){}
+  var L=document.getElementById("lock");
+  try{if(sessionStorage.getItem("lc.ok")==="1"){L.style.display="none";return}}catch(e){}
+  document.getElementById("lt").textContent=has?"輸入密碼解鎖":"第一次使用，請設定密碼";
+}
+function unlock(){
+  var v=document.getElementById("pin").value;if(!v)return;
+  var has=null;try{has=localStorage.getItem(PK)}catch(e){}
+  hash(v).then(function(h){
+    if(!has){try{localStorage.setItem(PK,h)}catch(e){}ok()}
+    else if(h===has)ok();
+    else{document.getElementById("lt").textContent="密碼錯誤，再試一次";document.getElementById("pin").value=""}
+  })
+}
+function ok(){try{sessionStorage.setItem("lc.ok","1")}catch(e){}document.getElementById("lock").style.display="none";document.getElementById("pin").value=""}
+function lockNow(){try{sessionStorage.removeItem("lc.ok")}catch(e){}location.reload()}
+function chPin(){var v=document.getElementById("np").value;if(!v)return toast("請輸入新密碼");hash(v).then(function(h){try{localStorage.setItem(PK,h)}catch(e){}document.getElementById("np").value="";toast("密碼已更新")})}
+/* 備份 */
+function exp(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="love-card-backup.json";a.click();toast("已匯出備份")}
+function imp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(typeof d.bal!=="number"||!d.vs||!d.hs)throw 0;S=d;save();render();toast("匯入成功")}catch(x){toast("檔案格式不正確")}};r.readAsText(f);e.target.value=""}
+/* 願望清單 */
+var WF="all";
+function setWF(f){WF=f;renderW()}
+function renderW(){
+  var W=S.wish||[];
+  var fs=[["all","全部"],["todo","想去"],["done","已去"],["","景點"],["","餐廳"]];
+  document.getElementById("wf").innerHTML=fs.map(function(f){return '<button class="'+(WF===f[0]?"on g":"g")+'" onclick="setWF(\''+f[0]+'\')">'+f[1]+'</button>'}).join("");
+  var L=W.map(function(w,i){return{w:w,i:i}}).filter(function(o){
+    if(WF==="all")return true;if(WF==="todo")return !o.w.done;if(WF==="done")return o.w.done;return (o.w.t||"").indexOf(WF)===0});
+  document.getElementById("ws").innerHTML=L.length?L.map(function(o){var w=o.w;
+    return '<div class="item'+(w.done?" done":"")+'"><span class="ic">'+esc((w.t||"").split(" ")[0])+'</span><div class="inf"><div class="nm">'+esc(w.n)+'</div><div class="sub">'+(w.m?esc(w.m)+" · ":"")+(w.done?"已去 "+esc(w.dd||""):"加入於 "+esc(w.d||""))+'</div></div><button class="g" onclick="togW('+o.i+')">'+(w.done?"還原":"去過了")+'</button><button class="x" onclick="delW('+o.i+')" aria-label="刪除">✕</button></div>'}).join(""):'<div class="empty">還沒有項目，按上方「＋ 願望清單」新增</div>';
+}
+function addW(){var n=document.getElementById("n4").value.trim();if(!n)return toast("請輸入名稱");
+  (S.wish=S.wish||[]).unshift({n:n,t:document.getElementById("t4").value,m:document.getElementById("m4").value.trim(),d:today(),done:false});
+  document.getElementById("n4").value="";document.getElementById("m4").value="";save();renderW();toast("已加入願望清單 ♥")}
+function togW(i){var w=S.wish[i];w.done=!w.done;w.dd=w.done?today():"";save();renderW();toast(w.done?"一起去過囉 ♥":"已還原")}
+function delW(i){if(!confirm("刪除「"+S.wish[i].n+"」？"))return;S.wish.splice(i,1);save();renderW()}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function today(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()}
 function toast(t){var e=document.getElementById("toast");e.textContent=t;e.className="on";setTimeout(function(){e.className=""},1800)}
 function tog(id){document.getElementById(id).classList.toggle("on")}
 function render(){
+  renderW();
   document.getElementById("bal").textContent=S.bal;
   document.getElementById("owner").textContent=S.owner;
   var v=document.getElementById("vs");
@@ -86,8 +141,8 @@ function redeem(i){var x=S.vs[i];if(S.bal<x.c)return;if(!confirm("確定兌換�
 function topup(){var a=parseInt(document.getElementById("a1").value),n=document.getElementById("n1").value.trim();if(!a||a<=0)return toast("請輸入點數");S.bal+=a;S.hs.unshift({n:"儲值："+(n||"獲得點數"),c:a,d:today()});document.getElementById("a1").value="";document.getElementById("n1").value="";save();render();toast("已儲值 "+a+" 點")}
 function addV(){var n=document.getElementById("n2").value.trim(),c=parseInt(document.getElementById("c2").value),i=document.getElementById("i2").value.trim();if(!n||!c)return toast("請填名稱與點數");S.vs.push({n:n,c:c,i:i||"🎟"});["n2","c2","i2"].forEach(function(k){document.getElementById(k).value=""});save();render();toast("已新增")}
 function setOwner(){var o=document.getElementById("o3").value.trim();if(!o)return;S.owner=o.toUpperCase();save();render();toast("已更新")}
-function reset(){if(confirm("確定要清除全部資料？")){S=JSON.parse(JSON.stringify(def));save();render()}}
-load();render();
+function reset(){if(confirm("確定要清除全部資料？")){S=cp(def);save();render()}}
+load();lockInit();
 </script>
 </body>
 </html>
