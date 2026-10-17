@@ -12,75 +12,183 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
 main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
-.cc{border-radius:20px;padding:22px;color:#fff;background:linear-gradient(135deg,#ff8fab,#e0567a 55%,#b13a64);box-shadow:0 10px 24px rgba(224,86,122,.35);position:relative;overflow:hidden}
+.cc{border-radius:20px;padding:22px;color:#fff;background:linear-gradient(135deg,#ff8fab,#e0567a 55%,#b13a64);background-size:cover;background-position:center;box-shadow:0 10px 24px rgba(224,86,122,.35);position:relative;overflow:hidden;text-shadow:0 1px 2px rgba(0,0,0,.25)}
 .cc:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.15)}
+.cc>*{position:relative;z-index:1}
 .row{display:flex;justify-content:space-between;align-items:center}
 .chip{width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#ffe9a8,#e6b95c)}
 .lbl{font-size:12px;opacity:.85;margin-top:22px}
 .bal{font-size:38px;font-weight:700;letter-spacing:1px}
 .num{letter-spacing:3px;font-size:14px;margin-top:14px;opacity:.9}
+.cinfo{font-size:12px;margin-top:10px;opacity:.95}
+.lvbar{height:5px;border-radius:99px;background:rgba(255,255,255,.3);margin-top:12px;overflow:hidden}
+.lvbar i{display:block;height:100%;background:#fff;border-radius:99px}
 h2{font-size:16px;margin:26px 0 10px}
+.h2r{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:26px 0 10px;flex-wrap:wrap}
+.h2r h2{margin:0}
 .item{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-.ic{font-size:26px}.inf{flex:1}.nm{font-weight:600}.sub{font-size:12px;color:var(--mut)}
+.item.wi{flex-wrap:wrap}
+.item.dim{opacity:.55}
+.acts{width:100%;display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.ic{font-size:26px}.inf{flex:1;min-width:0}.nm{font-weight:600;word-break:break-word}.sub{font-size:12px;color:var(--mut);word-break:break-word}
+.stars{color:#e6a817;font-size:13px}
 button{font:inherit;border:0;border-radius:999px;padding:8px 14px;background:var(--ac);color:#fff;cursor:pointer}
-button:disabled{opacity:.35}
-button.g{background:transparent;color:var(--ac);border:1px solid var(--ac);padding:6px 12px;font-size:13px}
+button:disabled{opacity:.35;cursor:default}
+button.g,a.g{background:transparent;color:var(--ac);border:1px solid var(--ac);padding:6px 12px;font-size:13px;text-decoration:none;border-radius:999px;display:inline-block;font-family:inherit}
+button.x{background:none;color:var(--mut);padding:2px 8px;font-size:12px}
 .amt{font-weight:600;color:var(--mut)}
 .empty{color:var(--mut);text-align:center;padding:16px;font-size:14px}
 .panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-top:10px;display:none;gap:8px;flex-wrap:wrap}
 .panel.on{display:flex}
+.panel.col{flex-direction:column;flex-wrap:nowrap}
+.fr{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.fr label{font-size:12px;color:var(--mut);width:84px}
 input,select{flex:1;min-width:90px;font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--bd);background:var(--bg);color:var(--fg)}
+input[type=color]{flex:none;width:56px;min-width:0;height:38px;padding:2px}
 .tools{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-#lock{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}#lock input{flex:none;width:200px;text-align:center;font-size:20px;letter-spacing:6px}
-.chips{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}.chips button{padding:5px 12px;font-size:13px}.chips button.on{background:var(--ac);color:#fff}.done .nm{text-decoration:line-through;color:var(--mut)}.x{background:none;color:var(--mut);padding:4px 8px;font-size:16px}
-#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none}
+.chips{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.chips button{padding:5px 12px;font-size:13px}
+.chips button.on{background:var(--ac);color:#fff}
+.done .nm{text-decoration:line-through;color:var(--mut)}
+details{margin-top:6px}
+summary{cursor:pointer;color:var(--mut);font-size:13px;margin-bottom:8px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.tile{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:10px 6px;text-align:center}
+.tile b{display:block;font-size:20px;color:var(--ac)}
+.tile span{font-size:12px;color:var(--mut)}
+.bar{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:center;margin-bottom:8px;font-size:12px}
+.bt{display:flex;flex-direction:column;gap:3px}
+.bt i{display:block;height:7px;border-radius:99px;background:var(--ac);min-width:2px}
+.bt i.sp{background:var(--mut)}
+#lock{position:fixed;inset:0;z-index:9;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+#lock input{flex:none;width:200px;text-align:center;font-size:20px;letter-spacing:6px}
+#md{position:fixed;inset:0;z-index:8;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px}
+#md.on{display:flex}
+#mb{background:var(--card);color:var(--fg);border-radius:18px;padding:18px;width:100%;max-width:420px;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:6px}
+#mb h3{margin:0 0 4px;font-size:17px}
+#mb label{font-size:12px;color:var(--mut);margin-top:4px}
+#mb input,#mb select{width:100%;flex:none}
+.mbt{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.pick{text-align:center;padding:10px 0}
+.pick .ic{font-size:44px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:10;max-width:90vw;text-align:center}
 #toast.on{opacity:1}
 </style>
 </head>
 <body>
-<div id="lock"><div style="font-size:48px">💳</div><div id="lt">輸入密碼</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()"><button onclick="unlock()">解鎖</button></div>
+<div id="lock"><div style="font-size:48px">&#x1F4B3;</div><div id="lt">輸入密碼</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()"><button onclick="unlock()">解鎖</button></div>
+
 <main>
-  <div class="cc">
+  <div class="cc" id="cc">
     <div class="row"><b>♥ 小寶專屬集點卡</b><div class="chip"></div></div>
     <div class="lbl">可用餘額</div>
     <div class="bal"><span id="bal">0</span> <small style="font-size:14px">點</small></div>
     <div class="num">**** **** **** 1314</div>
-    <div class="row" style="margin-top:10px;font-size:12px"><span id="owner">MY DEAR</span><span>VALID THRU ∞</span></div>
+    <div class="row" style="margin-top:10px;font-size:12px"><span id="owner">MY DEAR</span><span id="lvn"></span></div>
+    <div class="cinfo" id="cinfo"></div>
+    <div class="lvbar"><i id="lvb"></i></div>
+    <div class="cinfo" id="lvt" style="margin-top:6px"></div>
   </div>
 
   <div class="tools">
-    <button class="g" onclick="tog('p1')">＋ 儲值點數</button>
-    <button class="g" onclick="tog('p2')">＋ 新增兌換券</button>
-    <button class="g" onclick="tog('p4')">＋ 願望清單</button>
-    <button class="g" onclick="tog('p3')"> 設定</button>
+    <button class="g" onclick="openTopup()">＋ 儲值點數</button>
+    <button class="g" onclick="openDeduct()">－ 扣點</button>
+    <button class="g" onclick="togSet()">&#x270E; 設定</button>
   </div>
-  <div class="panel" id="p1"><input id="a1" type="number" placeholder="點數"><input id="n1" placeholder="原因（例：洗碗）"><button onclick="topup()">儲值</button></div>
-  <div class="panel" id="p2"><input id="n2" placeholder="兌換券名稱"><input id="c2" type="number" placeholder="所需點數"><input id="i2" placeholder="圖示 emoji" style="max-width:100px"><button onclick="addV()">新增</button></div>
-  <div class="panel" id="p4"><select id="t4" style="flex:none"><option> 景點</option><option> 餐廳</option><option> 其他</option></select><input id="n4" placeholder="名稱（例：鼎泰豐）"><input id="m4" placeholder="備註／地點（選填）"><button onclick="addW()">加入</button></div>
-  <div class="panel" id="p3"><input id="o3" placeholder="卡片上的名字（英文）"><button onclick="setOwner()">儲存</button><input id="np" type="password" placeholder="新密碼"><button onclick="chPin()">改密碼</button></div>
 
-  <h2>🎟 兌換券</h2>
+  <div class="panel col" id="p3">
+    <div class="fr"><label>卡片名字（英文）</label><input id="o3" placeholder="例：MY DEAR"></div>
+    <div class="fr"><label>在一起日期</label><input id="d3" type="date"></div>
+    <div class="fr"><label>生日</label><input id="b3" type="date"></div>
+    <div class="fr"><label>卡面顏色</label><select id="th3"><option value="level">跟隨卡片等級</option><option value="custom">自訂顏色</option></select><input id="c3" type="color" value="#e0567a"></div>
+    <div class="fr"><label>卡面照片</label><button class="g" onclick="$('f2').click()">選擇照片</button><button class="g" onclick="clrPhoto()">移除照片</button><input type="file" id="f2" accept="image/*" hidden onchange="pickPhoto(event)"></div>
+    <div class="fr"><button onclick="saveSet()">儲存設定</button></div>
+    <div class="fr"><label>更改密碼</label><input id="np" type="password" placeholder="新密碼"><button onclick="chPin()">改密碼</button></div>
+  </div>
+
+  <div class="item" style="margin-top:14px">
+    <span class="ic">&#x1F4C5;</span>
+    <div class="inf"><div class="nm">每日簽到</div><div class="sub" id="cks"></div></div>
+    <button id="ckb" onclick="checkin()">簽到</button>
+  </div>
+
+  <div class="h2r"><h2>&#x1F3AB; 我的票券</h2></div>
+  <div id="tks"></div>
+
+  <div class="h2r"><h2>&#x1F39F; 兌換券</h2><button class="g" onclick="openV()">＋ 新增</button></div>
   <div id="vs"></div>
 
-  <h2> 願望清單</h2>
+  <div class="h2r"><h2>&#x1F4AD; 願望清單</h2><span><button class="g" onclick="rnd()">&#x1F3B2; 隨機抽一個</button> <button class="g" onclick="openW()">＋ 新增</button></span></div>
   <div class="chips" id="wf"></div>
   <div id="ws"></div>
 
-  <h2> 歷史紀錄</h2>
+  <div class="h2r"><h2>&#x1F4CA; 統計</h2></div>
+  <div id="st"></div>
+
+  <div class="h2r"><h2>&#x1F4DC; 歷史紀錄</h2></div>
   <div id="hs"></div>
-  <div style="text-align:center;margin-top:20px"><button class="g" onclick="exp()">匯出備份</button> <button class="g" onclick="document.getElementById('f').click()">匯入備份</button> <button class="g" onclick="lockNow()"> 鎖定</button> <button class="g" onclick="reset()">重設</button><input type="file" id="f" accept=".json" hidden onchange="imp(event)"></div>
+
+  <div style="text-align:center;margin-top:20px"><button class="g" onclick="exp()">匯出備份</button> <button class="g" onclick="$('f').click()">匯入備份</button> <button class="g" onclick="lockNow()">&#x1F512; 鎖定</button> <button class="g" onclick="reset()">重設</button><input type="file" id="f" accept=".json" hidden onchange="imp(event)"></div>
 </main>
+
+<div id="md"><div id="mb"></div></div>
 <div id="toast"></div>
+
 <script>
 var KEY="lovecard.v1";
+/* ===== 可自行調整的參數 ===== */
+var LV=[{n:"普通卡",en:"CLASSIC",min:0,c:"#e0567a"},{n:"金卡",en:"GOLD",min:1000,c:"#d49a12"},{n:"白金卡",en:"PLATINUM",min:3000,c:"#5f6f94"}]; /* 累積獲得點數達 min 升級 */
+var CK_BASE=5,CK_3=5,CK_7=20; /* 簽到：每天基本點數；連續 3 天額外；連續 7 天額外 */
+/* ============================ */
+var E={ticket:"\u{1F39F}",cal:"\u{1F4C5}",pin:"\u{1F4CD}",food:"\u{1F374}",spark:"✨",map:"\u{1F5FA}"};
+var TI={"景點":E.pin,"餐廳":E.food,"其他":E.spark};
 var def={bal:520,owner:"MY DEAR",vs:[
 {n:"飲料一杯",c:50,i:""},{n:"指定餐廳約會",c:300,i:""},{n:"早餐一份",c:200,i:""},{n:"小禮物一份",c:150,i:""},{n:"買衣服",c:500,i:""}],
 hs:[{n:"初始儲值",c:520,d:"開卡禮"}]};
-var S;
+var S,WF="all",HL=20,TO=false;
+
+/* ---------- 小工具 ---------- */
+function $(id){return document.getElementById(id)}
+function val(id){return $(id).value.trim()}
 function cp(o){return JSON.parse(JSON.stringify(o))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("儲存失敗，請檢查瀏覽器設定")}}
-function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):cp(def)}catch(e){S=cp(def)}render()}
-/* PIN 鎖 */
+function pad(n){return n<10?"0"+n:""+n}
+function isoOf(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function isoToday(){return isoOf(new Date())}
+function isoYest(){var d=new Date();d.setDate(d.getDate()-1);return isoOf(d)}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function today(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()}
+function pdate(s){var a=(s||"").split("-");return new Date(+a[0],+a[1]-1,+a[2])}
+function midnight(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function mkey(h){if(h.ts){var d=new Date(h.ts);return d.getFullYear()+"-"+pad(d.getMonth()+1)}var m=/^(\d{4})\/(\d{1,2})\//.exec(h.d||"");return m?m[1]+"-"+pad(+m[2]):""}
+function st(n){return "★".repeat(n)}
+function toast(t){var e=$("toast");e.textContent=t;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className=""},2200)}
+function tog(id){$(id).classList.toggle("on")}
+function btn(cls,act,id,label,dis){return '<button class="'+cls+'" data-a="'+act+'" data-id="'+esc(id)+'"'+(dis?" disabled":"")+'>'+label+'</button>'}
+function mix(h,t,p){var n=parseInt(h.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;function f(c){return Math.round(c+(t-c)*p)}return "rgb("+f(r)+","+f(g)+","+f(b)+")"}
+function rgba(h,a){var n=parseInt(h.slice(1),16);return "rgba("+(n>>16)+","+((n>>8)&255)+","+(n&255)+","+a+")"}
+
+/* ---------- 資料 ---------- */
+function normT(t){t=t||"";return t.indexOf("景點")>=0?"景點":t.indexOf("餐廳")>=0?"餐廳":"其他"}
+function mig(){
+  S.vs=S.vs||[];S.hs=S.hs||[];S.tk=S.tk||[];S.wish=S.wish||[];
+  S.ck=S.ck||{last:"",streak:0};S.cfg=S.cfg||{};
+  if(!S.cfg.mode)S.cfg.mode="level";
+  if(!S.cfg.color)S.cfg.color="#e0567a";
+  S.vs.forEach(function(v){if(!v.id)v.id=uid()});
+  S.hs.forEach(function(h){
+    if(!h.id)h.id=uid();
+    if(!h.k){
+      h.k=h.c<0?"redeem":"topup";
+      if(h.c<0){var nm=(h.n||"").replace(/^兌換：/,"");var v=S.vs.find(function(x){return x.n===nm});if(v)h.vid=v.id}
+    }
+  });
+  S.wish.forEach(function(w){if(!w.id)w.id=uid();w.t=normT(w.t);w.star=w.star||0;w.url=w.url||""});
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("儲存失敗，請檢查瀏覽器設定或空間")}}
+function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):cp(def)}catch(e){S=cp(def)}mig();render()}
+
+/* ---------- PIN 鎖 ---------- */
 var PK="lovecard.pin";
 function hash(t){
   if(window.crypto&&crypto.subtle){return crypto.subtle.digest("SHA-256",new TextEncoder().encode("lc"+t)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,"0")}).join("")})}
@@ -88,60 +196,295 @@ function hash(t){
 }
 function lockInit(){
   var has=null;try{has=localStorage.getItem(PK)}catch(e){}
-  var L=document.getElementById("lock");
-  try{if(sessionStorage.getItem("lc.ok")==="1"){L.style.display="none";return}}catch(e){}
-  document.getElementById("lt").textContent=has?"輸入密碼解鎖":"第一次使用，請設定密碼";
+  try{if(sessionStorage.getItem("lc.ok")==="1"){$("lock").style.display="none";return}}catch(e){}
+  $("lt").textContent=has?"輸入密碼解鎖":"第一次使用，請設定密碼";
 }
 function unlock(){
-  var v=document.getElementById("pin").value;if(!v)return;
+  var v=$("pin").value;if(!v)return;
   var has=null;try{has=localStorage.getItem(PK)}catch(e){}
   hash(v).then(function(h){
     if(!has){try{localStorage.setItem(PK,h)}catch(e){}ok()}
     else if(h===has)ok();
-    else{document.getElementById("lt").textContent="密碼錯誤，再試一次";document.getElementById("pin").value=""}
+    else{$("lt").textContent="密碼錯誤，再試一次";$("pin").value=""}
   })
 }
-function ok(){try{sessionStorage.setItem("lc.ok","1")}catch(e){}document.getElementById("lock").style.display="none";document.getElementById("pin").value=""}
+function ok(){try{sessionStorage.setItem("lc.ok","1")}catch(e){}$("lock").style.display="none";$("pin").value=""}
 function lockNow(){try{sessionStorage.removeItem("lc.ok")}catch(e){}location.reload()}
-function chPin(){var v=document.getElementById("np").value;if(!v)return toast("請輸入新密碼");hash(v).then(function(h){try{localStorage.setItem(PK,h)}catch(e){}document.getElementById("np").value="";toast("密碼已更新")})}
-/* 備份 */
+function chPin(){var v=$("np").value;if(!v)return toast("請輸入新密碼");hash(v).then(function(h){try{localStorage.setItem(PK,h)}catch(e){}$("np").value="";toast("密碼已更新")})}
+
+/* ---------- 備份 ---------- */
 function exp(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="love-card-backup.json";a.click();toast("已匯出備份")}
-function imp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(typeof d.bal!=="number"||!d.vs||!d.hs)throw 0;S=d;save();render();toast("匯入成功")}catch(x){toast("檔案格式不正確")}};r.readAsText(f);e.target.value=""}
-/* 願望清單 */
-var WF="all";
+function imp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(typeof d.bal!=="number"||!d.vs||!d.hs)throw 0;S=d;mig();save();render();toast("匯入成功")}catch(x){toast("檔案格式不正確")}};r.readAsText(f);e.target.value=""}
+
+/* ---------- 通用彈窗 ---------- */
+function closeM(){$("md").classList.remove("on");$("mb").innerHTML=""}
+function openRaw(h){$("mb").innerHTML=h;$("md").classList.add("on")}
+/* 自製確認視窗（不使用瀏覽器內建 confirm，避免在預覽或內嵌環境被擋掉） */
+function ask(msg,cb,label){
+  openRaw('<h3>'+esc(msg)+'</h3><div class="mbt"><button class="g" onclick="closeM()">取消</button><button id="myes">'+(label||"確定")+'</button></div>');
+  $("myes").onclick=function(){closeM();cb()};
+}
+function openM(title,fields,onSave,saveLabel){
+  var h='<h3>'+esc(title)+'</h3>';
+  fields.forEach(function(f){
+    h+='<label for="mf_'+f.id+'">'+esc(f.l)+'</label>';
+    if(f.t==="select"){h+='<select id="mf_'+f.id+'">'+f.o.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(o[0])===String(f.v)?' selected':'')+'>'+esc(o[1])+'</option>'}).join("")+'</select>'}
+    else h+='<input id="mf_'+f.id+'" type="'+(f.t||"text")+'" value="'+esc(f.v==null?"":f.v)+'" placeholder="'+esc(f.p||"")+'"'+(f.t==="number"?' inputmode="numeric" min="0"':'')+'>';
+  });
+  h+='<div class="mbt"><button class="g" onclick="closeM()">取消</button><button id="msave">'+(saveLabel||"儲存")+'</button></div>';
+  openRaw(h);
+  $("msave").onclick=function(){var v={};fields.forEach(function(f){v[f.id]=$("mf_"+f.id).value.trim()});if(onSave(v)!==false)closeM()};
+}
+
+/* ---------- 點數 / 等級 ---------- */
+function earned(){return S.hs.reduce(function(a,h){return a+(h.c>0?h.c:0)},0)}
+function lvIdx(){var t=earned(),k=0;for(var i=0;i<LV.length;i++)if(t>=LV[i].min)k=i;return k}
+function earn(e){var b=lvIdx();S.bal+=e.c;S.hs.unshift(e);var a=lvIdx();return a>b?LV[a].n:""}
+function openTopup(){
+  openM("儲值點數",[{id:"a",l:"點數",t:"number",p:"例：10"},{id:"n",l:"原因",p:"例：洗碗"}],function(v){
+    var a=parseInt(v.a);if(!a||a<=0){toast("請輸入點數");return false}
+    var up=earn({id:uid(),k:"topup",n:"儲值："+(v.n||"獲得點數"),c:a,d:today(),ts:Date.now()});
+    save();render();toast("已儲值 "+a+" 點"+(up?" \u{1F389} 升級為"+up+"！":""));
+  },"儲值");
+}
+function openDeduct(){
+  openM("手動扣點",[{id:"a",l:"扣除點數",t:"number",p:"例：20"},{id:"n",l:"原因",p:"例：遲到／調整"}],function(v){
+    var a=parseInt(v.a);if(!a||a<=0){toast("請輸入點數");return false}
+    if(a>S.bal){toast("扣的點數比餘額多（目前 "+S.bal+" 點）");return false}
+    S.bal-=a;S.hs.unshift({id:uid(),k:"deduct",n:"扣點："+(v.n||"調整"),c:-a,d:today(),ts:Date.now()});
+    save();render();toast("已扣 "+a+" 點");
+  },"扣點");
+}
+
+/* ---------- 撤銷歷史 ---------- */
+function undo(id){
+  var i=S.hs.findIndex(function(h){return h.id===id});if(i<0)return;
+  var x=S.hs[i],nb=S.bal-x.c,ti=-1;
+  if(nb<0)return toast("餘額不足，無法撤銷這筆");
+  if(x.k==="checkin"&&(!S.ck||S.ck.last!==x.cd))return toast("只能撤銷最近一次簽到");
+  if(x.k==="redeem"&&x.tid){
+    ti=S.tk.findIndex(function(t){return t.id===x.tid});
+    if(ti>=0&&S.tk[ti].used)return toast("票券已使用，請先到「我的票券」按「還原」");
+  }
+  ask("撤銷「"+x.n+"」？點數會"+(x.c>0?"扣回 ":"退回 ")+Math.abs(x.c)+" 點",function(){
+    var j=S.hs.findIndex(function(h){return h.id===id});if(j<0)return;
+    if(x.k==="checkin")S.ck=x.pk||{last:"",streak:0};
+    if(ti>=0){var k=S.tk.findIndex(function(t){return t.id===x.tid});if(k>=0)S.tk.splice(k,1)}
+    S.bal=nb;S.hs.splice(j,1);save();render();toast("已撤銷");
+  },"撤銷");
+}
+function more(){HL+=20;renderH()}
+
+/* ---------- 每日簽到 ---------- */
+function ckStreak(){var c=S.ck;return(c.last===isoToday()||c.last===isoYest())?c.streak:0}
+function ckBonus(s){return s%7===0?CK_7:(s%3===0?CK_3:0)}
+function renderCk(){
+  var done=S.ck.last===isoToday(),s=ckStreak(),rw=CK_BASE+ckBonus(s+1);
+  $("cks").textContent=done?"今天已簽到 · 連續 "+s+" 天 · 明天可領 +"+rw:(s?"連續 "+s+" 天 · 今天簽到可領 +"+rw:"今天簽到可領 +"+rw);
+  $("ckb").disabled=done;$("ckb").textContent=done?"已簽到":"簽到";
+}
+function checkin(){
+  var c=S.ck,t=isoToday();if(c.last===t)return toast("今天已經簽到過囉");
+  var ns=ckStreak()+1,bonus=ckBonus(ns),pts=CK_BASE+bonus,pk={last:c.last,streak:c.streak};
+  S.ck={last:t,streak:ns};
+  var up=earn({id:uid(),k:"checkin",n:"每日簽到（連續 "+ns+" 天"+(bonus?"，額外 +"+bonus:"")+"）",c:pts,d:today(),ts:Date.now(),cd:t,pk:pk});
+  save();render();toast("簽到成功 +"+pts+" 點"+(up?" \u{1F389} 升級為"+up+"！":""));
+}
+
+/* ---------- 兌換券 ---------- */
+function redeemCount(vid,monthOnly){var cm=isoToday().slice(0,7);return S.hs.filter(function(h){return h.k==="redeem"&&h.vid===vid&&(!monthOnly||mkey(h)===cm)}).length}
+function vInfo(v){
+  var p=[v.c+" 點"],why="";
+  if(v.once){p.push("限兌換一次");if(redeemCount(v.id)>0)why="已兌換"}
+  if(v.lim>0){var m=redeemCount(v.id,true);p.push("每月限 "+v.lim+" 次（本月 "+m+"）");if(!why&&m>=v.lim)why="本月額滿"}
+  if(v.exp){p.push("期限 "+v.exp.replace(/-/g,"/"));if(!why&&isoToday()>v.exp)why="已過期"}
+  if(!why&&S.bal<v.c)why="點數不足";
+  return{txt:p.join(" · "),why:why};
+}
+function renderV(){
+  $("vs").innerHTML=S.vs.length?S.vs.map(function(v){var s=vInfo(v);
+    return '<div class="item wi'+(s.why==="已過期"?" dim":"")+'"><span class="ic">'+esc(v.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(v.n)+'</div><div class="sub">'+esc(s.txt)+'</div></div>'+btn("","redeem",v.id,s.why||"兌換",!!s.why)+'<div class="acts">'+btn("x","editV",v.id,"編輯")+btn("x","delV",v.id,"刪除")+'</div></div>'
+  }).join(""):'<div class="empty">還沒有兌換券，按右上角「＋ 新增」</div>';
+}
+function openV(id){
+  var v=id?S.vs.find(function(x){return x.id===id}):null;
+  openM(v?"編輯兌換券":"新增兌換券",[
+    {id:"n",l:"名稱",v:v?v.n:"",p:"例：免費按摩"},
+    {id:"c",l:"所需點數",t:"number",v:v?v.c:"",p:"例：100"},
+    {id:"i",l:"圖示（emoji，可空白）",v:v?v.i:""},
+    {id:"lim",l:"每月限量（0 = 不限）",t:"number",v:v?(v.lim||0):0},
+    {id:"once",l:"只能兌換一次",t:"select",o:[["0","否"],["1","是"]],v:v&&v.once?"1":"0"},
+    {id:"exp",l:"有效期限（可空白）",t:"date",v:v?(v.exp||""):""}
+  ],function(x){
+    var c=parseInt(x.c);if(!x.n||!c||c<=0){toast("請填名稱與點數");return false}
+    var o={n:x.n,c:c,i:x.i,lim:Math.max(0,parseInt(x.lim)||0),once:x.once==="1",exp:x.exp};
+    if(v)Object.assign(v,o);else{o.id=uid();S.vs.push(o)}
+    save();render();toast(v?"已更新":"已新增");
+  });
+}
+function delV(id){
+  var v=S.vs.find(function(x){return x.id===id});if(!v)return;
+  ask("刪除兌換券「"+v.n+"」？（已兌換的票券和紀錄不受影響）",function(){
+    var i=S.vs.findIndex(function(x){return x.id===id});if(i<0)return;
+    S.vs.splice(i,1);save();render();toast("已刪除");
+  },"刪除");
+}
+function redeem(id){
+  var v=S.vs.find(function(x){return x.id===id});if(!v)return;
+  var s=vInfo(v);if(s.why)return toast(s.why);
+  ask("確定兌換「"+v.n+"」？將扣 "+v.c+" 點",function(){
+    var s2=vInfo(v);if(s2.why)return toast(s2.why);
+    var t={id:uid(),vid:v.id,n:v.n,i:v.i,c:v.c,d:today(),used:false};
+    S.tk.unshift(t);S.bal-=v.c;
+    S.hs.unshift({id:uid(),k:"redeem",n:"兌換："+v.n,c:-v.c,d:today(),ts:Date.now(),vid:v.id,tid:t.id});
+    save();render();toast("兌換成功，票券放進「我的票券」 ♥");
+  },"兌換");
+}
+
+/* ---------- 我的票券 ---------- */
+function renderTk(){
+  var un=S.tk.filter(function(t){return !t.used}),us=S.tk.filter(function(t){return t.used});
+  var h=un.length?un.map(function(t){return '<div class="item"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">兌換於 '+esc(t.d||"")+'</div></div>'+btn("","useT",t.id,"使用")+'</div>'}).join(""):'<div class="empty">目前沒有票券，去兌換一張吧</div>';
+  if(us.length)h+='<details'+(TO?" open":"")+' ontoggle="TO=this.open"><summary>已使用的票券（'+us.length+'）</summary>'+us.map(function(t){return '<div class="item dim"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">使用於 '+esc(t.ud||"")+'</div></div>'+btn("g","restT",t.id,"還原")+'</div>'}).join("")+'</details>';
+  $("tks").innerHTML=h;
+}
+function useT(id){
+  var t=S.tk.find(function(x){return x.id===id});if(!t)return;
+  ask("確定使用「"+t.n+"」？",function(){t.used=true;t.ud=today();save();render();toast("已使用，好好享受 ♥")},"使用");
+}
+function restT(id){var t=S.tk.find(function(x){return x.id===id});if(!t)return;t.used=false;delete t.ud;save();render();toast("已還原成未使用")}
+
+/* ---------- 願望清單 ---------- */
+function gw(id){return S.wish.find(function(w){return w.id===id})}
+function mapUrl(w){return /^https?:\/\//i.test(w.url||"")?w.url:"https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(w.n)}
 function setWF(f){WF=f;renderW()}
 function renderW(){
-  var W=S.wish||[];
-  var fs=[["all","全部"],["todo","想去"],["done","已去"],["","景點"],["","餐廳"]];
-  document.getElementById("wf").innerHTML=fs.map(function(f){return '<button class="'+(WF===f[0]?"on g":"g")+'" onclick="setWF(\''+f[0]+'\')">'+f[1]+'</button>'}).join("");
-  var L=W.map(function(w,i){return{w:w,i:i}}).filter(function(o){
-    if(WF==="all")return true;if(WF==="todo")return !o.w.done;if(WF==="done")return o.w.done;return (o.w.t||"").indexOf(WF)===0});
-  document.getElementById("ws").innerHTML=L.length?L.map(function(o){var w=o.w;
-    return '<div class="item'+(w.done?" done":"")+'"><span class="ic">'+esc((w.t||"").split(" ")[0])+'</span><div class="inf"><div class="nm">'+esc(w.n)+'</div><div class="sub">'+(w.m?esc(w.m)+" · ":"")+(w.done?"已去 "+esc(w.dd||""):"加入於 "+esc(w.d||""))+'</div></div><button class="g" onclick="togW('+o.i+')">'+(w.done?"還原":"去過了")+'</button><button class="x" onclick="delW('+o.i+')" aria-label="刪除">✕</button></div>'}).join(""):'<div class="empty">還沒有項目，按上方「＋ 願望清單」新增</div>';
+  var fs=[["all","全部"],["todo","想去"],["done","已去"],["景點",E.pin+" 景點"],["餐廳",E.food+" 餐廳"]];
+  $("wf").innerHTML=fs.map(function(f){return btn(WF===f[0]?"on g":"g","wf",f[0],f[1])}).join("");
+  var L=S.wish.map(function(w,i){return{w:w,i:i}}).filter(function(o){var w=o.w;return WF==="all"||(WF==="todo"?!w.done:WF==="done"?w.done:w.t===WF)});
+  L.sort(function(a,b){return(a.w.done?1:0)-(b.w.done?1:0)||(b.w.star||0)-(a.w.star||0)||a.i-b.i});
+  $("ws").innerHTML=L.length?L.map(function(o){var w=o.w,sub=[];
+    if(w.m)sub.push(esc(w.m));
+    if(w.done){sub.push("已去 "+esc(w.dd||""));if(w.rate)sub.push(st(w.rate)+"☆".repeat(5-w.rate));if(w.note)sub.push(esc(w.note))}
+    else sub.push("加入於 "+esc(w.d||""));
+    return '<div class="item wi'+(w.done?" done":"")+'"><span class="ic">'+(TI[w.t]||E.spark)+'</span><div class="inf"><div class="nm">'+esc(w.n)+(w.star?' <span class="stars">'+st(w.star)+'</span>':'')+'</div><div class="sub">'+sub.join(" · ")+'</div></div><div class="acts"><a class="g" href="'+esc(mapUrl(w))+'" target="_blank" rel="noopener">'+E.map+' 導航</a>'+btn("g","tw",w.id,w.done?"還原":"去過了")+btn("x","editW",w.id,"編輯")+btn("x","delW",w.id,"刪除")+'</div></div>'
+  }).join(""):'<div class="empty">這裡還沒有項目，按右上角「＋ 新增」</div>';
 }
-function addW(){var n=document.getElementById("n4").value.trim();if(!n)return toast("請輸入名稱");
-  (S.wish=S.wish||[]).unshift({n:n,t:document.getElementById("t4").value,m:document.getElementById("m4").value.trim(),d:today(),done:false});
-  document.getElementById("n4").value="";document.getElementById("m4").value="";save();renderW();toast("已加入願望清單 ♥")}
-function togW(i){var w=S.wish[i];w.done=!w.done;w.dd=w.done?today():"";save();renderW();toast(w.done?"一起去過囉 ♥":"已還原")}
-function delW(i){if(!confirm("刪除「"+S.wish[i].n+"」？"))return;S.wish.splice(i,1);save();renderW()}
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function today(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()}
-function toast(t){var e=document.getElementById("toast");e.textContent=t;e.className="on";setTimeout(function(){e.className=""},1800)}
-function tog(id){document.getElementById(id).classList.toggle("on")}
+function rateOpts(){return[["5",st(5)],["4",st(4)],["3",st(3)],["2",st(2)],["1",st(1)]]}
+function openW(id){
+  var w=id?gw(id):null;
+  var f=[
+    {id:"t",l:"類型",t:"select",o:[["景點","景點"],["餐廳","餐廳"],["其他","其他"]],v:w?w.t:"景點"},
+    {id:"n",l:"名稱",v:w?w.n:"",p:"例：鼎泰豐"},
+    {id:"m",l:"備註／地點",v:w?w.m:"",p:"選填"},
+    {id:"url",l:"Google Maps 網址",v:w?w.url:"",p:"貼上網址；沒貼則用名稱搜尋"},
+    {id:"star",l:"想去程度",t:"select",o:[["0","一般"],["1",st(1)+" 想去"],["2",st(2)+" 很想去"],["3",st(3)+" 最想去"]],v:w?String(w.star||0):"0"}
+  ];
+  if(w&&w.done){f.push({id:"rate",l:"評分",t:"select",o:rateOpts(),v:String(w.rate||5)});f.push({id:"note",l:"一句話感想",v:w.note||""})}
+  openM(w?"編輯願望":"新增願望",f,function(x){
+    if(!x.n){toast("請輸入名稱");return false}
+    if(x.url&&!/^https?:\/\//i.test(x.url)){toast("網址要以 http:// 或 https:// 開頭");return false}
+    var o={t:x.t,n:x.n,m:x.m,url:x.url,star:parseInt(x.star)||0};
+    if(w){Object.assign(w,o);if(w.done){w.rate=parseInt(x.rate)||5;w.note=x.note||""}}
+    else{o.id=uid();o.d=today();o.done=false;S.wish.unshift(o)}
+    save();render();toast(w?"已更新":"已加入願望清單 ♥");
+  });
+}
+function tw(id){
+  var w=gw(id);if(!w)return;
+  if(w.done){w.done=false;w.dd="";save();render();toast("已還原成想去");return}
+  openM("去過了！留下心得",[
+    {id:"rate",l:"評分",t:"select",o:rateOpts(),v:"5"},
+    {id:"note",l:"一句話感想（可空白）",v:"",p:"例：牛肉麵超好吃"}
+  ],function(x){w.done=true;w.dd=today();w.rate=parseInt(x.rate)||5;w.note=x.note||"";save();render();toast("一起去過囉 ♥")},"完成");
+}
+function delW(id){
+  var w=gw(id);if(!w)return;
+  ask("刪除「"+w.n+"」？",function(){
+    var i=S.wish.findIndex(function(x){return x.id===id});if(i<0)return;
+    S.wish.splice(i,1);save();render();toast("已刪除");
+  },"刪除");
+}
+function rnd(){
+  var pool=S.wish.filter(function(w){return !w.done&&((WF==="景點"||WF==="餐廳")?w.t===WF:true)});
+  if(!pool.length)return toast("想去的清單是空的，先加幾個吧");
+  var bag=[];pool.forEach(function(w){for(var i=0;i<1+(w.star||0);i++)bag.push(w)});
+  var w=bag[Math.floor(Math.random()*bag.length)];
+  openRaw('<h3>今天去這裡吧 ♥</h3><div class="pick"><div class="ic">'+(TI[w.t]||E.spark)+'</div><div class="nm" style="font-size:18px">'+esc(w.n)+(w.star?' <span class="stars">'+st(w.star)+'</span>':'')+'</div><div class="sub">'+esc(w.m||"")+'</div></div><div class="mbt"><button class="g" onclick="closeM()">關閉</button><button class="g" onclick="rnd()">再抽一次</button><a class="g" href="'+esc(mapUrl(w))+'" target="_blank" rel="noopener">'+E.map+' 導航</a></div>');
+}
+
+/* ---------- 設定 / 卡面 ---------- */
+function fillSet(){var c=S.cfg;$("o3").value=S.owner;$("d3").value=c.together||"";$("b3").value=c.bday||"";$("th3").value=c.mode||"level";$("c3").value=c.color||"#e0567a"}
+function togSet(){fillSet();tog("p3")}
+function setOwnerVal(){var o=val("o3");if(o)S.owner=o.toUpperCase()}
+function saveSet(){
+  setOwnerVal();
+  S.cfg.together=val("d3");S.cfg.bday=val("b3");S.cfg.mode=val("th3");
+  var c=val("c3");if(/^#[0-9a-f]{6}$/i.test(c))S.cfg.color=c;
+  save();render();toast("已儲存設定");
+}
+function pickPhoto(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){var im=new Image();
+    im.onload=function(){var m=720,s=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);S.cfg.photo=c.toDataURL("image/jpeg",.78);save();render();toast("已設定卡面照片")};
+    im.onerror=function(){toast("無法讀取這張圖片")};
+    im.src=r.result};
+  r.readAsDataURL(f);e.target.value="";
+}
+function clrPhoto(){if(!S.cfg.photo)return toast("目前沒有照片");delete S.cfg.photo;save();render();toast("已移除照片")}
+function renderCard(){
+  var t=earned(),k=lvIdx(),cur=LV[k],nx=LV[k+1],cf=S.cfg,el=$("cc");
+  var base=(cf.mode==="custom"&&/^#[0-9a-f]{6}$/i.test(cf.color||""))?cf.color:cur.c;
+  el.style.backgroundImage=cf.photo?'linear-gradient(rgba(0,0,0,.22),rgba(0,0,0,.5)),url("'+cf.photo+'")':'linear-gradient(135deg,'+mix(base,255,.3)+','+base+' 55%,'+mix(base,0,.35)+')';
+  el.style.boxShadow="0 10px 24px "+rgba(base,.35);
+  $("lvn").textContent=cur.en+" · "+cur.n;
+  if(nx){$("lvb").style.width=Math.min(100,Math.max(0,(t-cur.min)/(nx.min-cur.min)*100))+"%";$("lvt").textContent="累積 "+t+" 點 · 距離"+nx.n+"還差 "+(nx.min-t)+" 點"}
+  else{$("lvb").style.width="100%";$("lvt").textContent="已達最高等級 ♥ 累積 "+t+" 點"}
+  var p=[];
+  if(cf.together){var n=Math.round((midnight()-pdate(cf.together))/864e5)+1;if(n>=1)p.push("♥ 在一起第 "+n+" 天")}
+  if(cf.bday){var b=pdate(cf.bday);if(!isNaN(b)){var td=midnight(),nb=new Date(td.getFullYear(),b.getMonth(),b.getDate());if(nb<td)nb=new Date(td.getFullYear()+1,b.getMonth(),b.getDate());var dd=Math.round((nb-td)/864e5);p.push(dd===0?"\u{1F382} 今天生日！":"\u{1F382} 生日倒數 "+dd+" 天")}}
+  $("cinfo").textContent=p.join("　")||"在「設定」填入在一起日期和生日，這裡會顯示倒數";
+}
+
+/* ---------- 統計 ---------- */
+function renderStats(){
+  var cm=isoToday().slice(0,7),ea=0,sp=0,cE=0,cS=0,by={};
+  S.hs.forEach(function(h){var k=mkey(h),e=h.c>0?h.c:0,s=h.c<0?-h.c:0;ea+=e;sp+=s;if(k){by[k]=by[k]||{e:0,s:0};by[k].e+=e;by[k].s+=s;if(k===cm){cE+=e;cS+=s}}});
+  var months=[],d=new Date();d.setDate(1);
+  for(var i=0;i<6;i++){months.unshift(d.getFullYear()+"-"+pad(d.getMonth()+1));d.setMonth(d.getMonth()-1)}
+  var mx=1;months.forEach(function(k){var o=by[k]||{e:0,s:0};mx=Math.max(mx,o.e,o.s)});
+  var done=S.wish.filter(function(w){return w.done}).length;
+  var h='<div class="tiles"><div class="tile"><b>'+ea+'</b><span>累積獲得</span></div><div class="tile"><b>'+sp+'</b><span>已花費</span></div><div class="tile"><b>'+done+'</b><span>一起去過的地方</span></div></div>';
+  h+='<div class="sub" style="margin-bottom:8px">本月獲得 +'+cE+' · 花費 −'+cS+'　<span style="color:var(--ac)">■ 獲得</span> <span>■ 花費</span></div>';
+  h+=months.map(function(k){var o=by[k]||{e:0,s:0};return '<div class="bar"><span>'+parseInt(k.slice(5))+' 月</span><div class="bt"><i style="width:'+(o.e/mx*100)+'%"></i><i class="sp" style="width:'+(o.s/mx*100)+'%"></i></div><span>+'+o.e+' / −'+o.s+'</span></div>'}).join("");
+  $("st").innerHTML=h;
+}
+
+/* ---------- 歷史 ---------- */
+function renderH(){
+  var L=S.hs.slice(0,HL);
+  var h=L.length?L.map(function(x){var p=x.c>0;return '<div class="item"><div class="inf"><div class="nm">'+esc(x.n)+'</div><div class="sub">'+esc(x.d||"")+'</div></div><span class="amt" style="color:'+(p?"var(--ac)":"var(--mut)")+'">'+(p?"+":"")+x.c+'</span>'+btn("x","undo",x.id,"撤銷")+'</div>'}).join(""):'<div class="empty">尚無紀錄</div>';
+  if(S.hs.length>HL)h+='<div style="text-align:center">'+btn("g","more","","顯示更多（還有 "+(S.hs.length-HL)+" 筆）")+'</div>';
+  $("hs").innerHTML=h;
+}
+
+/* ---------- 總渲染 ---------- */
 function render(){
-  renderW();
-  document.getElementById("bal").textContent=S.bal;
-  document.getElementById("owner").textContent=S.owner;
-  var v=document.getElementById("vs");
-  v.innerHTML=S.vs.length?S.vs.map(function(x,i){return '<div class="item"><span class="ic">'+esc(x.i||"🎟")+'</span><div class="inf"><div class="nm">'+esc(x.n)+'</div><div class="sub">'+x.c+' 點</div></div><button onclick="redeem('+i+')"'+(S.bal<x.c?" disabled":"")+'>兌換</button></div>'}).join(""):'<div class="empty">還沒有兌換券</div>';
-  var h=document.getElementById("hs");
-  h.innerHTML=S.hs.length?S.hs.map(function(x){var p=x.c>0;return '<div class="item"><div class="inf"><div class="nm">'+esc(x.n)+'</div><div class="sub">'+esc(x.d)+'</div></div><span class="amt" style="color:'+(p?"var(--ac)":"var(--mut)")+'">'+(p?"+":"")+x.c+'</span></div>'}).join(""):'<div class="empty">尚無紀錄</div>';
+  $("bal").textContent=S.bal;$("owner").textContent=S.owner;
+  renderCard();renderCk();renderTk();renderV();renderW();renderStats();renderH();
 }
-function redeem(i){var x=S.vs[i];if(S.bal<x.c)return;if(!confirm("確定兌換「"+x.n+"」？"))return;S.bal-=x.c;S.hs.unshift({n:"兌換："+x.n,c:-x.c,d:today()});save();render();toast("兌換成功 ♥")}
-function topup(){var a=parseInt(document.getElementById("a1").value),n=document.getElementById("n1").value.trim();if(!a||a<=0)return toast("請輸入點數");S.bal+=a;S.hs.unshift({n:"儲值："+(n||"獲得點數"),c:a,d:today()});document.getElementById("a1").value="";document.getElementById("n1").value="";save();render();toast("已儲值 "+a+" 點")}
-function addV(){var n=document.getElementById("n2").value.trim(),c=parseInt(document.getElementById("c2").value),i=document.getElementById("i2").value.trim();if(!n||!c)return toast("請填名稱與點數");S.vs.push({n:n,c:c,i:i||"🎟"});["n2","c2","i2"].forEach(function(k){document.getElementById(k).value=""});save();render();toast("已新增")}
-function setOwner(){var o=document.getElementById("o3").value.trim();if(!o)return;S.owner=o.toUpperCase();save();render();toast("已更新")}
-function reset(){if(confirm("確定要清除全部資料？")){S=cp(def);save();render()}}
+function reset(){
+  ask("確定要清除全部資料？餘額、票券、願望清單和紀錄都會回到初始狀態（密碼不會被清除）",function(){
+    S=cp(def);mig();HL=20;WF="all";save();render();toast("已重設");
+  },"重設");
+}
+
+/* ---------- 事件 ---------- */
+var A={redeem:redeem,useT:useT,restT:restT,editV:openV,delV:delV,tw:tw,editW:openW,delW:delW,undo:undo,wf:setWF,more:more};
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-a]");if(!b)return;var f=A[b.getAttribute("data-a")];if(f)f(b.getAttribute("data-id"))});
+$("md").addEventListener("click",function(e){if(e.target===this)closeM()});
+$("mb").addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.tagName==="INPUT"){var s=$("msave");if(s)s.click()}});
 load();lockInit();
 </script>
 </body>
