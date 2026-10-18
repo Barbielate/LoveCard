@@ -112,16 +112,14 @@ pre{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8
     <div class="fr"><label>資料庫網址</label><input id="sy_u" placeholder="https://xxx.firebasedatabase.app" autocapitalize="off" autocomplete="off"></div>
     <div class="fr"><label>同步碼</label><input id="sy_c" placeholder="按「產生」或貼上" autocapitalize="off" autocomplete="off"><button class="g" onclick="genCode()">產生</button></div>
     <div class="fr"><button onclick="syConnect()">連線</button><button class="g" onclick="syCopy()">複製連線碼</button><button class="g" onclick="syOff()">中斷同步</button></div>
-    <details><summary>如何申請免費的 Firebase 資料庫？</summary>
+    <details><summary>如何連線同步？</summary>
       <div class="sub" style="line-height:1.7">
-      1. 到 console.firebase.google.com，用 Google 帳號登入，按「建立專案」（Google Analytics 可關閉）。<br>
-      2. 左側「建構」→「Realtime Database」→「建立資料庫」，位置選 asia-southeast1（新加坡），選「以鎖定模式啟動」。<br>
-      3. 切到「規則」分頁，貼上下面內容後按「發布」：
-      <pre>{"rules":{".read":false,".write":false,"rooms":{"$room":{".read":true,".write":true,".validate":"newData.hasChildren(['rev','json'])"}}}}</pre>
-      4. 切回「資料」分頁，複製最上方的網址（像 https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app）貼到上面「資料庫網址」。<br>
-      5. 按「產生」取得同步碼，再按「連線」。<br>
-      6. 第二支手機：開同一個網頁，按第一支手機的「複製連線碼」，把整串貼到第二支的「資料庫網址」欄，按「連線」，選「載入雲端資料」。<br>
-      注意：知道網址和同步碼的人都能讀寫這份資料，請不要外流。每支手機的 App 密碼各自獨立，不會同步。</div>
+      第一支手機<br>
+      1. 把資料庫網址貼到上方「資料庫網址」。<br>
+      2. 按「產生」取得同步碼，再按「連線」。<br>
+      第二支手機<br>
+      1. 在第一支手機按「複製連線碼」。<br>
+      2. 把整串貼到第二支手機的「資料庫網址」欄，按「連線」，選「載入雲端資料」。</div>
     </details>
   </div>
 
