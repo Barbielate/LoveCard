@@ -71,6 +71,8 @@ summary{cursor:pointer;color:var(--mut);font-size:13px;margin-bottom:8px}
 .mbt{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
 .pick{text-align:center;padding:10px 0}
 .pick .ic{font-size:44px}
+pre{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px;font-size:11px;white-space:pre-wrap;word-break:break-all;margin:6px 0;user-select:all}
+.stt{font-size:12px;color:var(--mut);margin-top:10px;cursor:pointer}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 18px;border-radius:999px;opacity:0;transition:.3s;pointer-events:none;z-index:10;max-width:90vw;text-align:center}
 #toast.on{opacity:1}
 </style>
@@ -95,6 +97,7 @@ summary{cursor:pointer;color:var(--mut);font-size:13px;margin-bottom:8px}
     <button class="g" onclick="openDeduct()">－ 扣點</button>
     <button class="g" onclick="togSet()">&#x270E; 設定</button>
   </div>
+  <div class="stt" id="sy" onclick="togSet()"></div>
 
   <div class="panel col" id="p3">
     <div class="fr"><label>卡片名字（英文）</label><input id="o3" placeholder="例：MY DEAR"></div>
@@ -104,6 +107,22 @@ summary{cursor:pointer;color:var(--mut);font-size:13px;margin-bottom:8px}
     <div class="fr"><label>卡面照片</label><button class="g" onclick="$('f2').click()">選擇照片</button><button class="g" onclick="clrPhoto()">移除照片</button><input type="file" id="f2" accept="image/*" hidden onchange="pickPhoto(event)"></div>
     <div class="fr"><button onclick="saveSet()">儲存設定</button></div>
     <div class="fr"><label>更改密碼</label><input id="np" type="password" placeholder="新密碼"><button onclick="chPin()">改密碼</button></div>
+    <div class="fr" style="margin-top:6px"><b style="font-size:14px">&#x2601; 雲端同步</b></div>
+    <div class="sub" id="sy2"></div>
+    <div class="fr"><label>資料庫網址</label><input id="sy_u" placeholder="https://xxx.firebasedatabase.app" autocapitalize="off" autocomplete="off"></div>
+    <div class="fr"><label>同步碼</label><input id="sy_c" placeholder="按「產生」或貼上" autocapitalize="off" autocomplete="off"><button class="g" onclick="genCode()">產生</button></div>
+    <div class="fr"><button onclick="syConnect()">連線</button><button class="g" onclick="syCopy()">複製連線碼</button><button class="g" onclick="syOff()">中斷同步</button></div>
+    <details><summary>如何申請免費的 Firebase 資料庫？</summary>
+      <div class="sub" style="line-height:1.7">
+      1. 到 console.firebase.google.com，用 Google 帳號登入，按「建立專案」（Google Analytics 可關閉）。<br>
+      2. 左側「建構」→「Realtime Database」→「建立資料庫」，位置選 asia-southeast1（新加坡），選「以鎖定模式啟動」。<br>
+      3. 切到「規則」分頁，貼上下面內容後按「發布」：
+      <pre>{"rules":{".read":false,".write":false,"rooms":{"$room":{".read":true,".write":true,".validate":"newData.hasChildren(['rev','json'])"}}}}</pre>
+      4. 切回「資料」分頁，複製最上方的網址（像 https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app）貼到上面「資料庫網址」。<br>
+      5. 按「產生」取得同步碼，再按「連線」。<br>
+      6. 第二支手機：開同一個網頁，按第一支手機的「複製連線碼」，把整串貼到第二支的「資料庫網址」欄，按「連線」，選「載入雲端資料」。<br>
+      注意：知道網址和同步碼的人都能讀寫這份資料，請不要外流。每支手機的 App 密碼各自獨立，不會同步。</div>
+    </details>
   </div>
 
   <div class="item" style="margin-top:14px">
@@ -186,7 +205,8 @@ function mig(){
   });
   S.wish.forEach(function(w){if(!w.id)w.id=uid();w.t=normT(w.t);w.star=w.star||0;w.url=w.url||""});
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("儲存失敗，請檢查瀏覽器設定或空間")}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast("儲存失敗，請檢查瀏覽器設定或空間")}}
+function save(){saveLocal();markDirty()}
 function load(){try{var r=localStorage.getItem(KEY);S=r?JSON.parse(r):cp(def)}catch(e){S=cp(def)}mig();render()}
 
 /* ---------- PIN 鎖 ---------- */
@@ -218,7 +238,11 @@ function exp(){var b=new Blob([JSON.stringify(S,null,1)],{type:"application/json
 function imp(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);if(typeof d.bal!=="number"||!d.vs||!d.hs)throw 0;S=d;mig();save();render();toast("匯入成功")}catch(x){toast("檔案格式不正確")}};r.readAsText(f);e.target.value=""}
 
 /* ---------- 通用彈窗 ---------- */
-function closeM(){$("md").classList.remove("on");$("mb").innerHTML=""}
+function closeM(){
+  if(SY.pend){SY.pend=false;if(PREV){Object.assign(SY,PREV);PREV=null}syPersist();setSt(SY.on?"ok":"off")}
+  else if(SY.confl){SY.confl=false;SY.hold=Date.now()+30000}
+  $("md").classList.remove("on");$("mb").innerHTML="";
+}
 function openRaw(h){$("mb").innerHTML=h;$("md").classList.add("on")}
 /* 自製確認視窗（不使用瀏覽器內建 confirm，避免在預覽或內嵌環境被擋掉） */
 function ask(msg,cb,label){
@@ -415,7 +439,7 @@ function rnd(){
 }
 
 /* ---------- 設定 / 卡面 ---------- */
-function fillSet(){var c=S.cfg;$("o3").value=S.owner;$("d3").value=c.together||"";$("b3").value=c.bday||"";$("th3").value=c.mode||"level";$("c3").value=c.color||"#e0567a"}
+function fillSet(){var c=S.cfg;$("o3").value=S.owner;$("d3").value=c.together||"";$("b3").value=c.bday||"";$("th3").value=c.mode||"level";$("c3").value=c.color||"#e0567a";$("sy_u").value=SY.url||"";$("sy_c").value=SY.code||"";renderSync()}
 function togSet(){fillSet();tog("p3")}
 function setOwnerVal(){var o=val("o3");if(o)S.owner=o.toUpperCase()}
 function saveSet(){
@@ -473,20 +497,114 @@ function renderH(){
 /* ---------- 總渲染 ---------- */
 function render(){
   $("bal").textContent=S.bal;$("owner").textContent=S.owner;
-  renderCard();renderCk();renderTk();renderV();renderW();renderStats();renderH();
+  renderSync();renderCard();renderCk();renderTk();renderV();renderW();renderStats();renderH();
 }
 function reset(){
-  ask("確定要清除全部資料？餘額、票券、願望清單和紀錄都會回到初始狀態（密碼不會被清除）",function(){
+  ask("確定要清除全部資料？餘額、票券、願望清單和紀錄都會回到初始狀態"+(SY.on?"，雲端和另一支手機的資料也會一起被清空":"")+"（密碼不會被清除）",function(){
     S=cp(def);mig();HL=20;WF="all";save();render();toast("已重設");
   },"重設");
 }
+
+/* ---------- 雲端同步（Firebase Realtime Database REST） ---------- */
+var SK="lovecard.sync",PT=null,PREV=null;
+var SY={on:false,url:"",code:"",rev:0,dirty:false,st:"off",last:"",busy:false,confl:false,pend:false,hold:0,ver:0};
+function syLoad(){try{var r=JSON.parse(localStorage.getItem(SK)||"null");if(r&&r.url&&r.code){SY.on=true;SY.url=r.url;SY.code=r.code;SY.rev=r.rev||0;SY.dirty=!!r.dirty;SY.st=SY.dirty?"pending":"ok"}}catch(e){}}
+function syPersist(){try{if(SY.on)localStorage.setItem(SK,JSON.stringify({url:SY.url,code:SY.code,rev:SY.rev,dirty:SY.dirty}));else localStorage.removeItem(SK)}catch(e){}}
+function okUrl(u){return /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)*\.(firebasedatabase\.app|firebaseio\.com)$/i.test(u)||/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(u)}
+function okCode(c){return /^[A-Za-z0-9_-]{16,64}$/.test(c)}
+function genCodeStr(){var cs="ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789",a=new Uint8Array(20),s="",i;if(window.crypto&&crypto.getRandomValues)crypto.getRandomValues(a);else for(i=0;i<20;i++)a[i]=Math.floor(Math.random()*256);for(i=0;i<20;i++)s+=cs.charAt(a[i]%cs.length);return s}
+function genCode(){$("sy_c").value=genCodeStr()}
+function api(p,o){
+  o=o||{};var ac=window.AbortController?new AbortController():null,to=setTimeout(function(){if(ac)ac.abort()},12000);
+  if(ac)o.signal=ac.signal;
+  return fetch(SY.url+"/rooms/"+SY.code+p+".json",o).then(function(r){clearTimeout(to);if(!r.ok)throw new Error("http "+r.status);return r.json()},function(e){clearTimeout(to);throw e});
+}
+function setSt(st){SY.st=st;renderSync()}
+function renderSync(){
+  var t;
+  if(!SY.on)t="☁ 尚未連線雲端（點此設定）";
+  else if(SY.st==="syncing")t="☁ 同步中…";
+  else if(SY.st==="offline")t="☁ 離線，有修改待同步（連上網路後自動同步）";
+  else if(SY.st==="pending"||SY.dirty)t="☁ 有修改待同步…";
+  else t="☁ 已同步"+(SY.last?" "+SY.last.split(" ")[1]:"");
+  var a=$("sy"),b=$("sy2");if(a)a.textContent=t;if(b)b.textContent=SY.on?t+" · 版本 "+SY.rev:"尚未連線。依下方教學申請後填入。";
+}
+function markDirty(){if(!SY.on)return;SY.ver++;SY.dirty=true;syPersist();setSt("pending");schedPush()}
+function schedPush(ms){clearTimeout(PT);PT=setTimeout(function(){push()},ms||700)}
+async function push(force){
+  if(!SY.on||SY.busy||SY.confl||SY.pend)return;
+  if(!force&&Date.now()<SY.hold)return schedPush(SY.hold-Date.now()+100);
+  SY.busy=true;setSt("syncing");var v=SY.ver,c=null;
+  try{
+    var r=await api("/rev");
+    if(!force&&r!=null&&r>SY.rev){c=r}
+    else{
+      var nr=Math.max(r||0,SY.rev)+1;
+      await api("",{method:"PUT",body:JSON.stringify({rev:nr,json:JSON.stringify(S),at:Date.now()})});
+      SY.rev=nr;SY.last=stamp();
+      if(SY.ver===v){SY.dirty=false;setSt("ok")}else{setSt("pending");schedPush()}
+    }
+  }catch(e){setSt("offline");schedPush(15000)}
+  SY.busy=false;syPersist();
+  if(c!==null)conflict(c);
+}
+function applyRemote(o){
+  var d;try{d=JSON.parse(o.json)}catch(e){return toast("雲端資料格式有誤，已略過")}
+  S=d;mig();saveLocal();SY.rev=o.rev||0;SY.dirty=false;SY.last=stamp();syPersist();setSt("ok");render();
+}
+async function tick(){
+  if(!SY.on||SY.busy||SY.confl||SY.pend||document.hidden)return;
+  if(SY.dirty)return push();
+  var v=SY.ver;
+  try{
+    var r=await api("/rev");
+    if(r!=null&&r>SY.rev){var o=await api("");if(o&&o.json&&SY.ver===v&&!SY.pend&&!SY.confl){applyRemote(o);toast("已同步另一支手機的最新資料")}}
+    else{SY.last=stamp();setSt("ok")}
+  }catch(e){setSt("offline")}
+}
+function conflict(r){
+  SY.confl=true;
+  openRaw('<h3>雲端有較新的資料</h3><div class="sub">可能是另一支手機剛改過。要用哪一份？</div><div class="mbt" style="flex-direction:column;align-items:stretch"><button id="cfC">載入雲端資料（放棄這台尚未同步的修改）</button><button class="g" id="cfL">用這台的資料覆蓋雲端</button></div>');
+  $("cfC").onclick=async function(){SY.confl=false;closeM();try{var o=await api("");if(o&&o.json){applyRemote(o);toast("已載入雲端資料")}}catch(e){setSt("offline");toast("讀取雲端失敗")}};
+  $("cfL").onclick=function(){SY.confl=false;closeM();SY.rev=r;SY.ver++;SY.dirty=true;push(true)};
+}
+async function syConnect(){
+  var u=val("sy_u"),c=val("sy_c");
+  if(u.indexOf("#")>0){var p=u.split("#");u=p[0];c=p[1]||c}
+  u=u.replace(/\/+$/,"");
+  if(!okUrl(u))return toast("資料庫網址格式不正確");
+  if(!okCode(c))return toast("同步碼需為 16–64 個英數字元，可按「產生」");
+  $("sy_u").value=u;$("sy_c").value=c;
+  PREV=cp({on:SY.on,url:SY.url,code:SY.code,rev:SY.rev,dirty:SY.dirty,st:SY.st,last:SY.last});
+  SY.on=true;SY.url=u;SY.code=c;SY.rev=0;SY.dirty=false;SY.confl=false;setSt("syncing");
+  var o;
+  try{o=await api("")}catch(e){Object.assign(SY,PREV);PREV=null;syPersist();setSt(SY.on?"offline":"off");return toast("連線失敗，請檢查網址和資料庫規則")}
+  if(!o||!o.json){PREV=null;SY.ver++;SY.dirty=true;syPersist();await push(true);if(SY.st==="ok")toast("已連線，這台的資料已上傳到雲端");return}
+  SY.pend=true;
+  openRaw('<h3>雲端已經有資料</h3><div class="sub">請選擇要保留哪一份。另一份會被取代，無法復原。</div><div class="mbt" style="flex-direction:column;align-items:stretch"><button id="ccC">載入雲端資料（這台目前的資料會被取代）</button><button class="g" id="ccL">用這台的資料覆蓋雲端</button></div>');
+  $("ccC").onclick=function(){SY.pend=false;PREV=null;closeM();applyRemote(o);toast("已連線，並載入雲端資料")};
+  $("ccL").onclick=function(){SY.pend=false;PREV=null;closeM();SY.rev=o.rev||0;SY.ver++;SY.dirty=true;syPersist();push(true).then(function(){toast("已連線，雲端已更新為這台的資料")})};
+}
+function syOff(){
+  if(!SY.on)return toast("目前沒有連線");
+  ask("中斷雲端同步？這台的資料會保留，但不再和雲端同步（雲端上的資料不會被刪除）",function(){SY.on=false;SY.dirty=false;syPersist();setSt("off");toast("已中斷同步")},"中斷");
+}
+function copyText(t){
+  function fb(){openRaw('<h3>長按下方文字並複製</h3><input id="cpx" readonly value="'+esc(t)+'"><div class="mbt"><button onclick="closeM()">關閉</button></div>');var x=$("cpx");x.focus();x.select()}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(function(){toast("已複製連線碼")},fb);else fb();
+}
+function syCopy(){if(!SY.on)return toast("尚未連線");copyText(SY.url+"#"+SY.code)}
+document.addEventListener("visibilitychange",function(){tick()});
+window.addEventListener("online",function(){tick()});
+window.addEventListener("focus",function(){tick()});
+setInterval(tick,5000);
 
 /* ---------- 事件 ---------- */
 var A={redeem:redeem,useT:useT,restT:restT,editV:openV,delV:delV,tw:tw,editW:openW,delW:delW,undo:undo,wf:setWF,more:more};
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-a]");if(!b)return;var f=A[b.getAttribute("data-a")];if(f)f(b.getAttribute("data-id"))});
 $("md").addEventListener("click",function(e){if(e.target===this)closeM()});
 $("mb").addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.tagName==="INPUT"){var s=$("msave");if(s)s.click()}});
-load();lockInit();
+syLoad();load();lockInit();if(SY.on)setTimeout(tick,300);
 </script>
 </body>
 </html>
