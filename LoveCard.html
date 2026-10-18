@@ -158,6 +158,7 @@ function isoYest(){var d=new Date();d.setDate(d.getDate()-1);return isoOf(d)}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function today(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()}
+function stamp(){var d=new Date();return d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+" "+pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())}
 function pdate(s){var a=(s||"").split("-");return new Date(+a[0],+a[1]-1,+a[2])}
 function midnight(){var d=new Date();return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
 function mkey(h){if(h.ts){var d=new Date(h.ts);return d.getFullYear()+"-"+pad(d.getMonth()+1)}var m=/^(\d{4})\/(\d{1,2})\//.exec(h.d||"");return m?m[1]+"-"+pad(+m[2]):""}
@@ -243,7 +244,7 @@ function earn(e){var b=lvIdx();S.bal+=e.c;S.hs.unshift(e);var a=lvIdx();return a
 function openTopup(){
   openM("儲值點數",[{id:"a",l:"點數",t:"number",p:"例：10"},{id:"n",l:"原因",p:"例：洗碗"}],function(v){
     var a=parseInt(v.a);if(!a||a<=0){toast("請輸入點數");return false}
-    var up=earn({id:uid(),k:"topup",n:"儲值："+(v.n||"獲得點數"),c:a,d:today(),ts:Date.now()});
+    var up=earn({id:uid(),k:"topup",n:"儲值："+(v.n||"獲得點數"),c:a,d:stamp(),ts:Date.now()});
     save();render();toast("已儲值 "+a+" 點"+(up?" \u{1F389} 升級為"+up+"！":""));
   },"儲值");
 }
@@ -251,7 +252,7 @@ function openDeduct(){
   openM("手動扣點",[{id:"a",l:"扣除點數",t:"number",p:"例：20"},{id:"n",l:"原因",p:"例：遲到／調整"}],function(v){
     var a=parseInt(v.a);if(!a||a<=0){toast("請輸入點數");return false}
     if(a>S.bal){toast("扣的點數比餘額多（目前 "+S.bal+" 點）");return false}
-    S.bal-=a;S.hs.unshift({id:uid(),k:"deduct",n:"扣點："+(v.n||"調整"),c:-a,d:today(),ts:Date.now()});
+    S.bal-=a;S.hs.unshift({id:uid(),k:"deduct",n:"扣點："+(v.n||"調整"),c:-a,d:stamp(),ts:Date.now()});
     save();render();toast("已扣 "+a+" 點");
   },"扣點");
 }
@@ -287,7 +288,7 @@ function checkin(){
   var c=S.ck,t=isoToday();if(c.last===t)return toast("今天已經簽到過囉");
   var ns=ckStreak()+1,bonus=ckBonus(ns),pts=CK_BASE+bonus,pk={last:c.last,streak:c.streak};
   S.ck={last:t,streak:ns};
-  var up=earn({id:uid(),k:"checkin",n:"每日簽到（連續 "+ns+" 天"+(bonus?"，額外 +"+bonus:"")+"）",c:pts,d:today(),ts:Date.now(),cd:t,pk:pk});
+  var up=earn({id:uid(),k:"checkin",n:"每日簽到（連續 "+ns+" 天"+(bonus?"，額外 +"+bonus:"")+"）",c:pts,d:stamp(),ts:Date.now(),cd:t,pk:pk});
   save();render();toast("簽到成功 +"+pts+" 點"+(up?" \u{1F389} 升級為"+up+"！":""));
 }
 
@@ -334,9 +335,9 @@ function redeem(id){
   var s=vInfo(v);if(s.why)return toast(s.why);
   ask("確定兌換「"+v.n+"」？將扣 "+v.c+" 點",function(){
     var s2=vInfo(v);if(s2.why)return toast(s2.why);
-    var t={id:uid(),vid:v.id,n:v.n,i:v.i,c:v.c,d:today(),used:false};
+    var now=stamp(),t={id:uid(),vid:v.id,n:v.n,i:v.i,c:v.c,d:now,used:false};
     S.tk.unshift(t);S.bal-=v.c;
-    S.hs.unshift({id:uid(),k:"redeem",n:"兌換："+v.n,c:-v.c,d:today(),ts:Date.now(),vid:v.id,tid:t.id});
+    S.hs.unshift({id:uid(),k:"redeem",n:"兌換："+v.n,c:-v.c,d:now,ts:Date.now(),vid:v.id,tid:t.id});
     save();render();toast("兌換成功，票券放進「我的票券」 ♥");
   },"兌換");
 }
@@ -344,13 +345,13 @@ function redeem(id){
 /* ---------- 我的票券 ---------- */
 function renderTk(){
   var un=S.tk.filter(function(t){return !t.used}),us=S.tk.filter(function(t){return t.used});
-  var h=un.length?un.map(function(t){return '<div class="item"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">兌換於 '+esc(t.d||"")+'</div></div>'+btn("","useT",t.id,"使用")+'</div>'}).join(""):'<div class="empty">目前沒有票券，去兌換一張吧</div>';
-  if(us.length)h+='<details'+(TO?" open":"")+' ontoggle="TO=this.open"><summary>已使用的票券（'+us.length+'）</summary>'+us.map(function(t){return '<div class="item dim"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">使用於 '+esc(t.ud||"")+'</div></div>'+btn("g","restT",t.id,"還原")+'</div>'}).join("")+'</details>';
+  var h=un.length?un.map(function(t){return '<div class="item"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">兌換時間 '+esc(t.d||"")+'</div></div>'+btn("","useT",t.id,"使用")+'</div>'}).join(""):'<div class="empty">目前沒有票券，去兌換一張吧</div>';
+  if(us.length)h+='<details'+(TO?" open":"")+' ontoggle="TO=this.open"><summary>已使用的票券（'+us.length+'）</summary>'+us.map(function(t){return '<div class="item dim"><span class="ic">'+esc(t.i||E.ticket)+'</span><div class="inf"><div class="nm">'+esc(t.n)+'</div><div class="sub">兌換 '+esc(t.d||"")+'<br>使用 '+esc(t.ud||"")+'</div></div>'+btn("g","restT",t.id,"還原")+'</div>'}).join("")+'</details>';
   $("tks").innerHTML=h;
 }
 function useT(id){
   var t=S.tk.find(function(x){return x.id===id});if(!t)return;
-  ask("確定使用「"+t.n+"」？",function(){t.used=true;t.ud=today();save();render();toast("已使用，好好享受 ♥")},"使用");
+  ask("確定使用「"+t.n+"」？",function(){t.used=true;t.ud=stamp();save();render();toast("已使用，好好享受 ♥")},"使用");
 }
 function restT(id){var t=S.tk.find(function(x){return x.id===id});if(!t)return;t.used=false;delete t.ud;save();render();toast("已還原成未使用")}
 
